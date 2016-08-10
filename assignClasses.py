@@ -95,8 +95,6 @@ if __name__ == "__main__":
 		# Save each dataset to folder named "datasets"
 		saveDataSetAsCSV(btcClassHistory, str(d))
 
-	#---To be continued---
-
 
 
 
