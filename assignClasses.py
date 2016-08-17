@@ -22,6 +22,8 @@ def readParameters(parameterKey):
 					parameterValue = line[2]
 				elif dataType == "list":
 					parameterValue = line[2].split(',')
+				elif dataType == "int":
+					parameterValue = int(line[2])
 
 	# If only one parameterKey was found, then return
 	if parameterKeyCounter == 1:
@@ -30,20 +32,20 @@ def readParameters(parameterKey):
 		sys.exit("ERROR:\t" + parameterKey +  " in parameters.txt must occur exactly once.")
 
 
-def readPriceHistoryCSV(fileName):
+def readKeyValueCSV(fileName):
 
 	# Open the CSV
-	priceHistory = []
+	ilist = []
 	with open(fileName, "r") as ifile:
 		for line in ifile:
 			line = line.rstrip().split(',')
 
 			# Record the price history
-			date = line[0]
-			price = float(line[1])
-			priceHistory.append((date, price))
+			key = line[0]
+			value = line[1]
+			ilist.append((key, value))
 
-	return priceHistory
+	return ilist
 
 
 def saveDataSetAsCSV(btcClassHistory, d):
@@ -70,8 +72,9 @@ if __name__ == "__main__":
 	btcPriceHistoryFileName = readParameters("completePriceHistoryFile")
 	dValueList = [float(i) for i in readParameters("listOfDValues")]
 
-	# Read in the bitcoin price history
-	btcPriceHistory = readPriceHistoryCSV(btcPriceHistoryFileName)
+	# Read in the bitcoin price history & change strings to float
+	btcPriceHistory = readKeyValueCSV(btcPriceHistoryFileName)
+	btcPriceHistory = [(ituple[0], float(ituple[1])) for ituple in btcPriceHistory]
 
 	# Create a dataset for each d value
 	for d in dValueList:
