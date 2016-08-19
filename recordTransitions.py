@@ -1,36 +1,6 @@
 import os
-import shutil
 import string
-
-
-def readParameters(parameterKey):
-
-	# Scan through file to find parameterKey
-	parameterKeyCounter = 0
-	with open('parameters.txt', "r") as ifile:
-		for line in ifile:
-			line = line.rstrip().split('\t')
-
-			# If parameterKey is found
-			if line[0] == parameterKey:
-
-				# Increment parameterKeyCounter
-				parameterKeyCounter += 1
-
-				# Get the data type and read in the data
-				dataType = line[1]
-				if dataType == "string":
-					parameterValue = line[2]
-				elif dataType == "list":
-					parameterValue = line[2].split(',')
-				elif dataType == "int":
-					parameterValue = int(line[2])
-
-	# If only one parameterKey was found, then return
-	if parameterKeyCounter == 1:
-		return parameterValue
-	else:
-		sys.exit("ERROR:\t" + parameterKey +  " in parameters.txt must occur exactly once.")
+import functionModule as fm
 
 
 def readKeyValueCSV(fileName):
@@ -119,7 +89,7 @@ def makeSublistCSVs(sublistTransFromState, dvalue, fromStateName):
 			
 			# Construct string to save to CSV file
 			#	ie. Transform ('date','UP','DOWN') to date,UP,DOWN
-			entryStringCSV = string.replace(str(entry)[1:-1], "\'", "")
+			entryStringCSV = string.replace(string.replace(str(entry)[1:-1], "\'", ""), " ", "")
 
 			# Save entryStringCSV to CSV file
 			text_file.write(entryStringCSV + "\n")
@@ -130,16 +100,12 @@ def makeSublistCSVs(sublistTransFromState, dvalue, fromStateName):
 if __name__ == "__main__":
 
 	# Read in the parameter for minimum size of statistical significance
-	minStatSignificantSize = readParameters("minStatSignificantSize")
+	minStatSignificantSize = fm.readParameters("minStatSignificantSize")
 	
 	# If transitions exists, delete it and its contents, and remake it.  Else, make it.
-	try:
-		shutil.rmtree('transitions')
-		os.makedirs('transitions')
-	except:
-		os.makedirs('transitions')
+	fm.createEmptyDirectory('transitions')
 
-	# Read in CSV files from datasets folder
+	# Read in CSV files from "datasets" folder
 	for ifile in os.listdir('datasets'):
 		if os.path.isfile('datasets/' + ifile):
 			btcPriceHistory = readKeyValueCSV('datasets/' + ifile)
