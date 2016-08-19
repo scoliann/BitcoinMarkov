@@ -1,35 +1,4 @@
-import sys
-import os
-
-
-def readParameters(parameterKey):
-
-	# Scan through file to find parameterKey
-	parameterKeyCounter = 0
-	with open('parameters.txt', "r") as ifile:
-		for line in ifile:
-			line = line.rstrip().split('\t')
-
-			# If parameterKey is found
-			if line[0] == parameterKey:
-
-				# Increment parameterKeyCounter
-				parameterKeyCounter += 1
-
-				# Get the data type and read in the data
-				dataType = line[1]
-				if dataType == "string":
-					parameterValue = line[2]
-				elif dataType == "list":
-					parameterValue = line[2].split(',')
-				elif dataType == "int":
-					parameterValue = int(line[2])
-
-	# If only one parameterKey was found, then return
-	if parameterKeyCounter == 1:
-		return parameterValue
-	else:
-		sys.exit("ERROR:\t" + parameterKey +  " in parameters.txt must occur exactly once.")
+import functionModule as fm
 
 
 def readKeyValueCSV(fileName):
@@ -50,14 +19,6 @@ def readKeyValueCSV(fileName):
 
 def saveDataSetAsCSV(btcClassHistory, d):
 
-	# If folder datasets does not yet exist, create it
-	if not os.path.exists('datasets'):
-    		os.makedirs('datasets')
-
-	# If the CSV file already exists, delete it
-	if os.path.exists('datasets/' + d + '.csv'):
-		os.remove('datasets/' + d + '.csv')
-
 	# Save the date in btcClassHistory as a CSV
 	text_file = open('datasets/' + d + '.csv', "a")
 	for entry in btcClassHistory:
@@ -68,13 +29,16 @@ def saveDataSetAsCSV(btcClassHistory, d):
 	
 if __name__ == "__main__":
 
-	# Read in the parameters from parameters.txt
-	btcPriceHistoryFileName = readParameters("completePriceHistoryFile")
-	dValueList = [float(i) for i in readParameters("listOfDValues")]
+	# Read in the parameters from "parameters.txt"
+	btcPriceHistoryFileName = fm.readParameters("completePriceHistoryFile")
+	dValueList = fm.readParameters("listOfDValues")
 
 	# Read in the bitcoin price history & change strings to float
 	btcPriceHistory = readKeyValueCSV(btcPriceHistoryFileName)
 	btcPriceHistory = [(ituple[0], float(ituple[1])) for ituple in btcPriceHistory]
+
+	# If "datasets" exists, delete it and its contents, and remake it.  Else, make it.
+	fm.createEmptyDirectory('datasets')
 
 	# Create a dataset for each d value
 	for d in dValueList:
@@ -90,13 +54,13 @@ if __name__ == "__main__":
 			priceJ = btcPriceHistory[date + 1][1]
 
 			# Assign class
-			if priceJ > (d * priceI):
+			if priceJ > (float(d) * priceI):
 				btcClassHistory.append((btcPriceHistory[date][0], 'UP'))
 			else:
 				btcClassHistory.append((btcPriceHistory[date][0], 'DOWN'))
 
 		# Save each dataset to folder named "datasets"
-		saveDataSetAsCSV(btcClassHistory, str(d))
+		saveDataSetAsCSV(btcClassHistory, d)
 
 
 
