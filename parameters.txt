@@ -3,4 +3,3 @@
 
 completePriceHistoryFile	string	coindesk-bpi-USD-close_data-2013-01-01_2016-08-09.csv
 listOfDValues	list	1.00,1.01,1.02,1.03,1.04,1.05
-minStatSignificantSize	int	30
